@@ -1,24 +1,20 @@
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
-
 import SignInModal from "./SignInModal";
 import SignUpModal from "./SignUpModal";
+import useUserRole from "../hooks/useUserRole";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const [user, setUser] = useState(null); // Firebase user
+  const [role, roleLoading] = useUserRole(user?.email);
 
-  const toggleMenu = () => setMenuOpen(!menuOpen);
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
-
-  // Track Firebase user login state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser || null);
@@ -28,13 +24,14 @@ const Navbar = () => {
 
   const handleLogout = () => {
     signOut(auth)
-      .then(() => {
-        setDropdownOpen(false);
-        console.log("Logged out");
-      })
-      .catch((err) => {
-        console.error("Logout error:", err.message);
-      });
+      .then(() => setDropdownOpen(false))
+      .catch((err) => console.error("Logout error:", err));
+  };
+
+  const dashboardLink = () => {
+    if (role === "admin") return "/admin/dashboard";
+    if (role === "moderator") return "/moderator/dashboard";
+    return "/dashboard";
   };
 
   return (
@@ -43,19 +40,22 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16 relative">
           {/* Mobile Hamburger */}
           <div className="md:hidden">
-            <button onClick={toggleMenu} className="text-gray-600">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="text-gray-600"
+            >
               <i className="ri-menu-2-line text-2xl"></i>
             </button>
           </div>
 
-          {/* Center Logo */}
+          {/* Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2 md:static md:translate-x-0">
             <Link to="/" className="text-2xl font-['Pacifico'] text-gray-900">
               AppOrbit
             </Link>
           </div>
 
-          {/* Center NavLinks (Desktop) */}
+          {/* Nav Links */}
           <div className="hidden md:flex flex-1 justify-center items-center space-x-2">
             {["/", "/products", "/categories", "/about"].map((path, i) => {
               const names = ["Home", "Products", "Categories", "About"];
@@ -75,12 +75,8 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Right Side (Auth Info) */}
+          {/* Auth Area */}
           <div className="flex items-center space-x-4 hidden md:flex">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100">
-              <i className="ri-search-line text-gray-600"></i>
-            </button>
-
             {!user ? (
               <>
                 <button
@@ -98,7 +94,10 @@ const Navbar = () => {
               </>
             ) : (
               <div className="relative">
-                <button onClick={toggleDropdown} className="flex items-center">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center"
+                >
                   <img
                     src={user.photoURL || "https://i.pravatar.cc/40"}
                     alt="profile"
@@ -109,14 +108,23 @@ const Navbar = () => {
                   <div className="absolute right-0 mt-4 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                     <div className="px-4 py-2 text-sm text-gray-700 border-b">
                       {user.displayName || "User"}
+                      {/* ✅ Show Role */}
+                      {!roleLoading && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Role: {role}
+                        </p>
+                      )}
                     </div>
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Dashboard
-                    </Link>
+
+                    {!roleLoading && (
+                      <Link
+                        to={dashboardLink()}
+                        onClick={() => setDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Dashboard
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -131,15 +139,13 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Sidebar Menu */}
+      {/* Mobile Menu */}
       {menuOpen && (
         <>
-          {/* Overlay */}
           <div
             className="fixed inset-0 bg-black bg-opacity-40 z-40"
-            onClick={toggleMenu}
+            onClick={() => setMenuOpen(false)}
           ></div>
-
           <div className="fixed top-0 left-0 h-full w-2/3 bg-black z-50 px-4 py-6 space-y-4 text-white border-r border-blue-900">
             {["/", "/products", "/categories", "/about"].map((path, i) => {
               const names = ["Home", "Products", "Categories", "About"];
@@ -147,19 +153,18 @@ const Navbar = () => {
                 <NavLink
                   key={path}
                   to={path}
-                  onClick={toggleMenu}
+                  onClick={() => setMenuOpen(false)}
                   className="block hover:text-black hover:bg-gray-100 px-4 py-[4px] rounded"
                 >
                   {names[i]}
                 </NavLink>
               );
             })}
-
             {!user ? (
               <>
                 <button
                   onClick={() => {
-                    toggleMenu();
+                    setMenuOpen(false);
                     setShowSignIn(true);
                   }}
                   className="block w-full text-left hover:text-black hover:bg-gray-100 px-4 py-[4px] rounded"
@@ -168,7 +173,7 @@ const Navbar = () => {
                 </button>
                 <button
                   onClick={() => {
-                    toggleMenu();
+                    setMenuOpen(false);
                     setShowSignUp(true);
                   }}
                   className="block w-full text-left hover:text-black hover:bg-gray-100 px-4 py-[4px] rounded"
@@ -180,18 +185,24 @@ const Navbar = () => {
               <>
                 <div className="text-sm font-medium px-4 py-2 border-b border-gray-700">
                   Hello, {user.displayName || "User"}
+                  {/* ✅ Show Role on mobile */}
+                  {!roleLoading && (
+                    <p className="text-xs text-gray-300">Role: {role}</p>
+                  )}
                 </div>
-                <NavLink
-                  to="/dashboard"
-                  onClick={toggleMenu}
-                  className="block w-full text-left hover:text-black hover:bg-gray-100 px-4 py-[4px] rounded"
-                >
-                  Dashboard
-                </NavLink>
+                {!roleLoading && (
+                  <NavLink
+                    to={dashboardLink()}
+                    onClick={() => setMenuOpen(false)}
+                    className="block w-full text-left hover:text-black hover:bg-gray-100 px-4 py-[4px] rounded"
+                  >
+                    Dashboard
+                  </NavLink>
+                )}
                 <button
                   onClick={() => {
                     handleLogout();
-                    toggleMenu();
+                    setMenuOpen(false);
                   }}
                   className="block w-full text-left hover:text-black hover:bg-gray-100 px-4 py-[4px] rounded"
                 >
