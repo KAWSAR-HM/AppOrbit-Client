@@ -14,7 +14,7 @@ const useUserRole = (email) => {
 
     setLoading(true);
     axios
-      .get(`http://localhost:5000/api/users/role/${email}`)
+      .get(`${import.meta.env.VITE_API_URL}/api/users/role/${email}`)
       .then((res) => {
         setRole(res.data?.role || "user");
         setLoading(false);

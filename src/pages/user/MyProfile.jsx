@@ -33,7 +33,7 @@ const MyProfile = () => {
   useEffect(() => {
     if (user?.email) {
       axios
-        .get(`http://localhost:5000/api/users/profile/${user.email}`)
+        .get(`${import.meta.env.VITE_API_URL}/users/profile/${user.email}`)
         .then((res) => {
           setProfile(res.data);
           setSubscribed(res.data.subscribed);
@@ -58,7 +58,7 @@ const MyProfile = () => {
         publicProfile,
       };
       const res = await axios.patch(
-        `http://localhost:5000/api/users/settings/${user.email}`,
+        `${import.meta.env.VITE_API_URL}/users/settings/${user.email}`,
         update
       );
       if (res.data.modifiedCount > 0) {

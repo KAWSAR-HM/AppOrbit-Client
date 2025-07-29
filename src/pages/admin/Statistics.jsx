@@ -15,7 +15,9 @@ const Statistics = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/stats");
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/stats`
+        );
         setStats(res.data);
       } catch (err) {
         console.error("Failed to load statistics:", err);

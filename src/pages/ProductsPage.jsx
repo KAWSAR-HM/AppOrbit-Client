@@ -21,7 +21,9 @@ const ProductsPage = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `http://localhost:5000/products?search=${searchTag}&page=${page}&limit=6`
+        `${
+          import.meta.env.VITE_API_URL
+        }/products?search=${searchTag}&page=${page}&limit=6`
       );
       setProducts(res.data.products);
       setTotalPages(res.data.totalPages);
@@ -45,7 +47,7 @@ const ProductsPage = () => {
 
     try {
       const res = await axios.patch(
-        `http://localhost:5000/products/upvote/${productId}`,
+        `${import.meta.env.VITE_API_URL}/products/upvote/${productId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -68,7 +70,7 @@ const ProductsPage = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/products/${productId}/comment`,
+        `${import.meta.env.VITE_API_URL}/products/${productId}/comment`,
         {
           comment: {
             userName: user?.displayName || "Anonymous",
@@ -101,7 +103,7 @@ const ProductsPage = () => {
 
     try {
       const res = await axios.patch(
-        `http://localhost:5000/products/${productId}/add-tag`,
+        `${import.meta.env.VITE_API_URL}/products/${productId}/add-tag`,
         { tag },
         {
           headers: { Authorization: `Bearer ${token}` },

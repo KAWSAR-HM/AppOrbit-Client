@@ -10,7 +10,9 @@ const TrendingProducts = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/products/trending");
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/products/trending`
+        );
         setProducts(res.data);
       } catch (err) {
         console.error("Error fetching trending products:", err.message);

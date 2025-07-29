@@ -14,7 +14,7 @@ const ReviewQueue = () => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/products/moderator-review",
+          `${import.meta.env.VITE_API_URL}/products/moderator-review`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -51,10 +51,10 @@ const ReviewQueue = () => {
     let payload = {};
 
     if (action === "feature") {
-      url = `http://localhost:5000/products/mark-as-featured/${id}`;
+      url = `${import.meta.env.VITE_API_URL}/products/mark-as-featured/${id}`;
       payload = { isFeatured: true };
     } else if (action === "approve" || action === "reject") {
-      url = `http://localhost:5000/products/${id}`;
+      url = `${import.meta.env.VITE_API_URL}/products/${id}`;
       payload = { status: action === "approve" ? "Accepted" : "Rejected" };
     } else {
       console.warn("❌ Unknown action:", action);

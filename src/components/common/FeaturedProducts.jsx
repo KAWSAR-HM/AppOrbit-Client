@@ -20,7 +20,7 @@ const FeaturedProducts = () => {
     const fetchFeatured = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/products/featured-products"
+          `${import.meta.env.VITE_API_URL}/products/featured-products`
         );
         setFeaturedProducts(res.data);
       } catch (err) {
@@ -38,7 +38,7 @@ const FeaturedProducts = () => {
 
     try {
       const res = await axios.patch(
-        `http://localhost:5000/products/upvote/${productId}`,
+        `${import.meta.env.VITE_API_URL}/products/upvote/${productId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -62,7 +62,7 @@ const FeaturedProducts = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/products/${productId}/comment`,
+        `${import.meta.env.VITE_API_URL}/products/${productId}/comment`,
         {
           comment: {
             userName: user?.displayName || "Anonymous",
@@ -96,7 +96,7 @@ const FeaturedProducts = () => {
 
     try {
       const res = await axios.patch(
-        `http://localhost:5000/products/${productId}/add-tag`,
+        `${import.meta.env.VITE_API_URL}/products/${productId}/add-tag`,
         { tag },
         {
           headers: { Authorization: `Bearer ${token}` },

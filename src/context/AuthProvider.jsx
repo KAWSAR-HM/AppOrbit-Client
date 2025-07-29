@@ -30,16 +30,19 @@ const AuthProvider = ({ children }) => {
 
       try {
         // 🛡️ Get JWT token
-        const jwtRes = await axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {
-          email,
-        });
+        const jwtRes = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/jwt`,
+          {
+            email,
+          }
+        );
 
         const token = jwtRes.data.token;
         localStorage.setItem("access-token", token);
         console.log(token);
         // 🧠 Get user role
         const roleRes = await axios.get(
-          `${import.meta.env.VITE_API_URL}/users/${email}`,
+          `${import.meta.env.VITE_API_URL}/api/users/${email}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -14,11 +14,14 @@ const ReportedContents = () => {
   useEffect(() => {
     const fetchReported = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/products/reported", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/products/reported`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         setReported(res.data || []);
       } catch (err) {
@@ -39,11 +42,14 @@ const ReportedContents = () => {
     if (!confirm) return;
 
     try {
-      const res = await axios.delete(`http://localhost:5000/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log("Deleted:", res.data);
 

@@ -25,7 +25,7 @@ const MyProducts = () => {
         const token = localStorage.getItem("access-token");
 
         const res = await axios.get(
-          `http://localhost:5000/products/user/${user.email}`,
+          `${import.meta.env.VITE_API_URL}/products/user/${user.email}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -56,7 +56,7 @@ const MyProducts = () => {
     try {
       const token = localStorage.getItem("access-token");
 
-      await axios.delete(`http://localhost:5000/products/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/products/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

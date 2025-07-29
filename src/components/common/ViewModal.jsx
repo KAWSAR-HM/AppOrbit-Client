@@ -17,11 +17,14 @@ const ViewModal = () => {
       // 🔐 JWT token আনছি localStorage থেকে
       const token = localStorage.getItem("access-token");
 
-      const res = await axios.get(`http://localhost:5000/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       console.log(res.data);
       setProduct(res.data);
     } catch (error) {

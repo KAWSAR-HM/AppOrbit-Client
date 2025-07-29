@@ -41,7 +41,7 @@ const ProductCard = ({ product }) => {
 
     try {
       const res = await axios.patch(
-        `http://localhost:5000/products/upvote/${_id}`,
+        `${import.meta.env.VITE_API_URL}/products/upvote/${_id}`,
         { userEmail: user.email },
         {
           headers: {
