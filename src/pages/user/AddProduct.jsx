@@ -195,7 +195,7 @@ const AddProduct = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/products/add-product",
+        `${import.meta.env.VITE_API_URL}/products/add-product`,
         finalData,
         {
           headers: {
