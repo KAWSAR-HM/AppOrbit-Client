@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const useUserRole = (email) => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (email) {
-      fetch(`http://localhost:5000/users/role/${email}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setRole(data.role);
-          setLoading(false);
-        })
-        .catch(() => {
-          setRole("user"); // fallback role
-          setLoading(false);
-        });
+    if (!email) {
+      setRole(null);
+      setLoading(false);
+      return;
     }
+
+    setLoading(true);
+    axios
+      .get(`http://localhost:5000/api/users/role/${email}`)
+      .then((res) => {
+        setRole(res.data?.role || "user");
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("❌ Role fetch failed:", err);
+        setRole("user");
+        setLoading(false);
+      });
   }, [email]);
 
   return [role, loading];

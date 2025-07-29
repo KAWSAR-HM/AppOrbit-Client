@@ -1,18 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as echarts from "echarts";
+import axios from "axios";
 
 const Statistics = () => {
+  const [stats, setStats] = useState({
+    accepted: 0,
+    pending: 0,
+    rejected: 0,
+    totalProducts: 0,
+    totalReviews: 0,
+    totalUsers: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/stats");
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to load statistics:", err);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   useEffect(() => {
     const chartDom = document.getElementById("productChart");
+    if (!chartDom) return;
     const myChart = echarts.init(chartDom);
     const option = {
-      tooltip: {
-        trigger: "item",
-      },
-      legend: {
-        orient: "vertical",
-        left: "left",
-      },
+      tooltip: { trigger: "item" },
+      legend: { orient: "vertical", left: "left" },
       series: [
         {
           name: "Products",
@@ -24,10 +43,7 @@ const Statistics = () => {
             borderColor: "#fff",
             borderWidth: 2,
           },
-          label: {
-            show: false,
-            position: "center",
-          },
+          label: { show: false, position: "center" },
           emphasis: {
             label: {
               show: true,
@@ -35,13 +51,11 @@ const Statistics = () => {
               fontWeight: "bold",
             },
           },
-          labelLine: {
-            show: false,
-          },
+          labelLine: { show: false },
           data: [
-            { value: 892, name: "Accepted Products" },
-            { value: 245, name: "Pending Products" },
-            { value: 110, name: "Rejected Products" },
+            { value: stats.accepted, name: "Accepted Products" },
+            { value: stats.pending, name: "Pending Products" },
+            { value: stats.rejected, name: "Rejected Products" },
           ],
         },
       ],
@@ -49,7 +63,7 @@ const Statistics = () => {
 
     myChart.setOption(option);
     window.addEventListener("resize", () => myChart.resize());
-  }, []);
+  }, [stats]);
 
   return (
     <section>
@@ -74,12 +88,20 @@ const Statistics = () => {
 
           <div className="space-y-6">
             <StatCard
-              count="1,247"
+              count={stats.totalProducts.toLocaleString()}
               label="Total Products"
               icon="ri-product-hunt-line"
             />
-            <StatCard count="8,932" label="Total Reviews" icon="ri-star-line" />
-            <StatCard count="2,156" label="Total Users" icon="ri-user-line" />
+            <StatCard
+              count={stats.totalReviews.toLocaleString()}
+              label="Total Reviews"
+              icon="ri-star-line"
+            />
+            <StatCard
+              count={stats.totalUsers.toLocaleString()}
+              label="Total Users"
+              icon="ri-user-line"
+            />
           </div>
         </div>
       </section>

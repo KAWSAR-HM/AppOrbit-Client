@@ -28,10 +28,11 @@ const Navbar = () => {
       .catch((err) => console.error("Logout error:", err));
   };
 
+  // ✅ Dynamically route based on role
   const dashboardLink = () => {
-    if (role === "admin") return "/admin/dashboard";
-    if (role === "moderator") return "/moderator/dashboard";
-    return "/dashboard";
+    if (role === "admin") return "/dashboard/admin/statistics";
+    if (role === "moderator") return "/moderator/dashboard/review-queue";
+    return "/user/dashboard/my-profile";
   };
 
   return (
@@ -55,7 +56,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Nav Links */}
+          {/* Nav Links (Desktop) */}
           <div className="hidden md:flex flex-1 justify-center items-center space-x-2">
             {["/", "/products", "/categories", "/about"].map((path, i) => {
               const names = ["Home", "Products", "Categories", "About"];
@@ -75,7 +76,7 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Auth Area */}
+          {/* Auth Section (Desktop) */}
           <div className="flex items-center space-x-4 hidden md:flex">
             {!user ? (
               <>
@@ -108,7 +109,6 @@ const Navbar = () => {
                   <div className="absolute right-0 mt-4 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                     <div className="px-4 py-2 text-sm text-gray-700 border-b">
                       {user.displayName || "User"}
-                      {/* ✅ Show Role */}
                       {!roleLoading && (
                         <p className="text-xs text-gray-500 mt-1">
                           Role: {role}
@@ -116,7 +116,7 @@ const Navbar = () => {
                       )}
                     </div>
 
-                    {!roleLoading && (
+                    {!roleLoading && role && (
                       <Link
                         to={dashboardLink()}
                         onClick={() => setDropdownOpen(false)}
@@ -185,12 +185,11 @@ const Navbar = () => {
               <>
                 <div className="text-sm font-medium px-4 py-2 border-b border-gray-700">
                   Hello, {user.displayName || "User"}
-                  {/* ✅ Show Role on mobile */}
                   {!roleLoading && (
                     <p className="text-xs text-gray-300">Role: {role}</p>
                   )}
                 </div>
-                {!roleLoading && (
+                {!roleLoading && role && (
                   <NavLink
                     to={dashboardLink()}
                     onClick={() => setMenuOpen(false)}
@@ -214,7 +213,7 @@ const Navbar = () => {
         </>
       )}
 
-      {/* Modals */}
+      {/* Auth Modals */}
       <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />
       <SignUpModal isOpen={showSignUp} onClose={() => setShowSignUp(false)} />
     </nav>
